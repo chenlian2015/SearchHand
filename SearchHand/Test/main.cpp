@@ -200,29 +200,24 @@ std::wstring GrabSearchEngineTest(const std::wstring &strRequest)
 int _tmain(int /*argc*/, _TCHAR** /*argv*/)
 {
 
-	std::wstring searchAddress[] = {L"https://www.google.com.hk/search?q=你好", L"https://search.yahoo.com/search?p=helloworld", L"https://www.bing.com/search?q=test"};
+	std::wstring searchAddress[] = {L"https://www.google.com.hk/search?q=你好", L"https://search.yahoo.com/search?p=helloworld", L"http://www.bing.com/search?q=helloworld"};
 
 
-	std::wstring str = GrabSearchEngineTest(searchAddress[1]);//若您在數秒內仍未能自動跳轉，請點擊這裏。
-	ParserHtml ph;
+	std::wstring str = GrabSearchEngineTest(searchAddress[0]);
+	ParserHtml phG;
+	phG.Parse(str.c_str(), ParserHtml::GOOGLE);
+	phG.showForDebug();
 
-	ph.Parse(str.c_str(), ParserHtml::YAHOO);
+	str = GrabSearchEngineTest(searchAddress[1]);
+	ParserHtml phY;
+	phY.Parse(str.c_str(), ParserHtml::YAHOO);
+	phY.showForDebug();
 
-	int n = 0;
-	std::wcout.imbue(std::locale("chs"));
-	for (std::vector<SearchResItem>::iterator it = ph.m_pageItems.begin(); it != ph.m_pageItems.end(); it++)
-	{
-		std::wcout<<it->title<<std::endl;
-		std::wcout<<it->time<<std::endl;
-		std::wcout<<it->httplink<<std::endl;
-		std::wcout<<it->aabstract<<std::endl;
-		std::wcout<<L"-----------------"<<std::endl;
-		std::wcout<<n++<<endl;
-		std::wcout.flush();
-	}
+	str = GrabSearchEngineTest(searchAddress[2]);
+	ParserHtml phB;
+	phB.Parse(str.c_str(), ParserHtml::BING);
+	phB.showForDebug();
 	
-
-
 	return 0;
 }
 

@@ -6,6 +6,7 @@
 #include <vector>
 #include <string.h>
 #include <set>
+#include <iostream>
 
 struct wstringComparer
 {
@@ -52,9 +53,15 @@ private:
 	
 	int ParseGoogleDom(void);
 	int ParseYahooDom(void);
+	int ParseBingDom(void);
 
 	int GetChild(const std::wstring& szClassName, const std::wstring& szTagName, CComQIPtr<IHTMLElement> &spEleParent, std::vector<CComQIPtr<IHTMLElement>> &vecSpEleOut, const bool &bAll = false);
-	bool checkTagClass(CComQIPtr<IHTMLElement> &spEle, const std::wstring &className, const std::wstring &tagName);
+	bool checkTagClass(CComQIPtr<IHTMLElement> &spEle, const std::wstring &className, const std::wstring &tagName, const std::wstring & target);
 	
+	
+	
+public:
+	int showForDebug();
+
 };
 
