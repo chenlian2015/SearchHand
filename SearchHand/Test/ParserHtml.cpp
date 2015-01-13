@@ -2,6 +2,11 @@
 #include "ParserHtml.h"
 
 
+std::wstring ParserHtml::GOOGLE(L"google");
+std::wstring ParserHtml::YAHOO(L"yahoo");
+std::wstring ParserHtml::BING(L"bing");
+std::wstring ParserHtml::BAIDU(L"baidu");
+
 ParserHtml::ParserHtml(void)
 {
 	
@@ -14,7 +19,7 @@ ParserHtml::~ParserHtml(void)
 
 #define COM_R(H,P,R)  if(FAILED(H) || NULL == (P)) return R;
 
-int ParserHtml::Parse(const wchar_t * szHtmlDom)
+int ParserHtml::Parse(const wchar_t * szHtmlDom, const std::wstring &name)
 {
 	if (NULL == m_pHTMLDocument)
 	{
@@ -36,7 +41,11 @@ int ParserHtml::Parse(const wchar_t * szHtmlDom)
 
 	hr = m_pHTMLDocument->close();
 
-	ParseGoogleDom();
+	if (_wcsicmp(name.c_str(), ParserHtml::GOOGLE.c_str()) == 0)
+	{
+		ParseGoogleDom();
+	}
+	
 	return 0;
 }
 
@@ -54,7 +63,7 @@ int ParserHtml::CreateDom(void)
 	return 0;
 }
 
-bool checkTag(CComQIPtr<IHTMLElement> &spEle, const std::wstring &className, const std::wstring &tagName)
+bool ParserHtml::checkTagClass(CComQIPtr<IHTMLElement> &spEle, const std::wstring &className, const std::wstring &tagName)
 {
 	bool bRet = false;
 	
@@ -65,6 +74,9 @@ bool checkTag(CComQIPtr<IHTMLElement> &spEle, const std::wstring &className, con
 	
 	std::wstring eleClassName, eleTagName;
 	
+	CComBSTR bstrOut, bstrIn;
+	spEle->get_outerHTML(&bstrOut);
+	spEle->get_innerHTML(&bstrIn);
 	if (NULL != bstrTagName)
 	{
 		eleTagName = bstrTagName;
@@ -85,7 +97,7 @@ bool checkTag(CComQIPtr<IHTMLElement> &spEle, const std::wstring &className, con
 	return bRet;
 }
 
-int GetOneChildElement(const std::wstring& szClassName, const std::wstring& szTagName, CComQIPtr<IHTMLElement> &spEleParent, std::vector<CComQIPtr<IHTMLElement>> &vecSpEleOut, const bool &bAll = false)
+int ParserHtml::GetChild(const std::wstring& szClassName, const std::wstring& szTagName, CComQIPtr<IHTMLElement> &spEleParent, std::vector<CComQIPtr<IHTMLElement>> &vecSpEleOut, const bool &bAll)
 {
 
 	CComQIPtr<IDispatch> spDisTmp;
@@ -94,6 +106,10 @@ int GetOneChildElement(const std::wstring& szClassName, const std::wstring& szTa
 
 	hr = spEleParent->get_children(&spDisTmp);
 	COM_R(hr, spDisTmp, -1)
+
+		CComBSTR bstrOut, bstrIn;
+	spEleParent->get_outerHTML(&bstrOut);
+	spEleParent->get_innerHTML(&bstrIn);
 
 		spCollect = spDisTmp;
 	COM_R(S_OK, spCollect, -1)
@@ -113,7 +129,7 @@ int GetOneChildElement(const std::wstring& szClassName, const std::wstring& szTa
 
 		CComQIPtr<IHTMLElement> spEle = spDisTmpEle;
 
-		if(checkTag(spEle, szClassName, szTagName))
+		if(checkTagClass(spEle, szClassName, szTagName))
 		{
 			
 			vecSpEleOut.push_back(spEle);
@@ -144,42 +160,34 @@ int ParserHtml::ParseGoogleDom(void)
 	HRESULT hr = spDoc3->getElementById(google_items_container_id, &spgoogle_items_container_ol);
 	COM_R(hr, spgoogle_items_container_ol, -1);
 
-	CComQIPtr<IHTMLElement> spEleDiv_srg;
-	 std::vector<CComQIPtr<IHTMLElement>> spEleVec;
-	GetOneChildElement(L"srg", L"div", spgoogle_items_container_ol, spEleVec,  false);
-	if (spEleVec.size() == 0)
+	CComQIPtr<IDispatch> spDisRsoAllChild;
+	spgoogle_items_container_ol->get_all(&spDisRsoAllChild);
+
+	CComQIPtr<IHTMLElementCollection> spCollectionHtmlElement(spDisRsoAllChild);
+	if (NULL == spCollectionHtmlElement)
 	{
 		return -1;
 	}
-	spEleDiv_srg = spEleVec[0];
 
-	COM_R(hr, spEleDiv_srg, -1);
+	long lenRsoAllChildsCnt = 0;
+	spCollectionHtmlElement->get_length(&lenRsoAllChildsCnt);
+	
 
-	//<li class="g"> collention 
-	CComQIPtr<IDispatch> spDisRsoChild;
-	spEleDiv_srg->get_children(&spDisRsoChild);
-
-	CComQIPtr<IHTMLElementCollection> spDisRsoChildCollection;
-	spDisRsoChildCollection = spDisRsoChild;
-	long lenDisRsoChildsCnt = 0;
-	COM_R(S_OK, spDisRsoChildCollection, -1);
-
-	spDisRsoChildCollection->get_length(&lenDisRsoChildsCnt);
-	for (long l=0; l<lenDisRsoChildsCnt; l++)
+	for (long l=0; l<lenRsoAllChildsCnt; l++)
 	{
 		//deal one <li class="g">
 		SearchResItem sri;
 
 		CComQIPtr<IHTMLElement> spLi_G;
 		CComQIPtr<IDispatch> spTmp;
-		spDisRsoChildCollection->item(CComVariant(l), CComVariant(l), &spTmp);
+		spCollectionHtmlElement->item(CComVariant(l), CComVariant(l), &spTmp);
 		if(NULL == spTmp)
 		{
 			continue;
 		}
 
 		spLi_G = spTmp;
-		if(!checkTag(spLi_G, L"g", L"li"))
+		if(!checkTagClass(spLi_G, L"g", L"li"))
 		{
 			continue;
 		}
@@ -208,9 +216,9 @@ int ParserHtml::ParseGoogleDom(void)
 			}
 			spEleTmp = spDisTmp;
 
-			if(checkTag(spEleTmp, L"st", L"span"))
+			if(checkTagClass(spEleTmp, L"st", L"span"))
 			{
-				
+
 				spanSt = spEleTmp;
 				if (NULL != h3R)
 				{
@@ -220,9 +228,9 @@ int ParserHtml::ParseGoogleDom(void)
 				continue;
 			}
 
-			if(checkTag(spEleTmp, L"r", L"h3"))
+			if(checkTagClass(spEleTmp, L"r", L"h3"))
 			{
-				
+
 				h3R = spEleTmp;
 				if (NULL != spanSt)
 				{
@@ -241,8 +249,10 @@ int ParserHtml::ParseGoogleDom(void)
 		std::wstring strTagName(L"a");
 		std::wstring strClassName(L"");
 		CComQIPtr<IHTMLElement> spEleA;
-		spEleVec.clear();
-		GetOneChildElement(strClassName, strTagName, h3R, spEleVec, false);
+
+
+		std::vector<CComQIPtr<IHTMLElement>> spEleVec;
+		GetChild(strClassName, strTagName, h3R, spEleVec, false);
 		if (spEleVec.size()==0)
 		{
 			continue;
@@ -259,7 +269,7 @@ int ParserHtml::ParseGoogleDom(void)
 			{
 				continue;
 			}
-			
+
 			CComBSTR bstrHref;
 			spAnchor->get_href(&bstrHref);
 
@@ -267,7 +277,7 @@ int ParserHtml::ParseGoogleDom(void)
 			{
 				sri.httplink=bstrHref;
 			}
-			
+
 			spEleA->get_innerText(&bstrTitle);
 			if(NULL != bstrTitle)
 			{
@@ -279,15 +289,15 @@ int ParserHtml::ParseGoogleDom(void)
 
 		if (NULL != spanSt)
 		{
-		
+
 			CComQIPtr<IHTMLElement> spanTime;
 			spEleVec.clear();
-			GetOneChildElement(L"f", L"span", spanSt, spEleVec, false);
-			if (spEleVec.size() == 0)
+			GetChild(L"f", L"span", spanSt, spEleVec, false);
+			if (spEleVec.size() > 0)
 			{
-				continue;
+				spanTime = spEleVec[0];	
 			}
-			spanTime = spEleVec[0];
+
 
 			if (NULL != spanTime)
 			{
@@ -313,7 +323,7 @@ int ParserHtml::ParseGoogleDom(void)
 			}
 
 			spEleVec.clear();
-			GetOneChildElement(L"", L"em", spanSt, spEleVec, true);
+			GetChild(L"", L"em", spanSt, spEleVec, true);
 			for (std::vector<CComQIPtr<IHTMLElement>>::iterator it =  spEleVec.begin();
 				it != spEleVec.end();
 				it++)
@@ -324,14 +334,20 @@ int ParserHtml::ParseGoogleDom(void)
 
 				if (NULL != bstrEm)
 				{
-					
+
 					sri.em.insert(bstrEm.m_str);
 				}
 			}
-			
-		}
 
+		}
+		m_pageItems.push_back(sri);
 	}
+	
+	
+
+
+
+	
 
 	return 0;
 }

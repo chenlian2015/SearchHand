@@ -7,6 +7,14 @@
 #include <string.h>
 #include <set>
 
+struct wstringComparer
+{
+public:
+	bool operator()(const std::wstring &x, const std::wstring &y) const
+	{
+		return true;
+	}
+};
 
 struct SearchResItem
 {
@@ -14,7 +22,7 @@ struct SearchResItem
 	std::wstring time;
 	std::wstring httplink;
 	std::wstring aabstract;
-	std::set<std::wstring, > em;
+	std::set<std::wstring, wstringComparer> em;
 };
 
 //std::vector<SearchResItem> SearchResPage;
@@ -22,18 +30,28 @@ struct SearchResItem
 class ParserHtml
 {
 public:
+	static std::wstring GOOGLE;
+	static std::wstring YAHOO;
+	static std::wstring BING;
+	static std::wstring BAIDU;
+
+public:
 	ParserHtml(void);
 	~ParserHtml(void);
-	int Parse(const wchar_t * szHtmlDom);
+	int Parse(const wchar_t * szHtmlDom, const std::wstring &searchEngineName);
 
+	std::vector<SearchResItem>		  m_pageItems;
 private:
 	ATL::CComQIPtr<IHTMLDocument2>    m_pHTMLDocument;
 	ATL::CComPtr<IUnknown>            m_punk;
+	
 
-	std::vector<SearchResItem>		  m_pageItems;
 
-public:
+private:
 	int CreateDom(void);
 	int ParseGoogleDom(void);
+
+	int GetChild(const std::wstring& szClassName, const std::wstring& szTagName, CComQIPtr<IHTMLElement> &spEleParent, std::vector<CComQIPtr<IHTMLElement>> &vecSpEleOut, const bool &bAll = false);
+	bool checkTagClass(CComQIPtr<IHTMLElement> &spEle, const std::wstring &className, const std::wstring &tagName);
 };
 
