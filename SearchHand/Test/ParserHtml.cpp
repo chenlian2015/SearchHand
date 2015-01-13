@@ -46,6 +46,11 @@ int ParserHtml::Parse(const wchar_t * szHtmlDom, const std::wstring &name)
 		ParseGoogleDom();
 	}
 	
+	if (_wcsicmp(name.c_str(), ParserHtml::YAHOO.c_str()) == 0)
+	{
+		ParseYahooDom();
+	}
+
 	return 0;
 }
 
@@ -175,7 +180,7 @@ int ParserHtml::ParseGoogleDom(void)
 
 	for (long l=0; l<lenRsoAllChildsCnt; l++)
 	{
-		//deal one <li class="g">
+		//deal with one <li class="g">
 		SearchResItem sri;
 
 		CComQIPtr<IHTMLElement> spLi_G;
@@ -342,12 +347,165 @@ int ParserHtml::ParseGoogleDom(void)
 		}
 		m_pageItems.push_back(sri);
 	}
-	
-	
 
 
+	return 0;
+}
 
-	
+int ParserHtml::ParseYahooDom(void)
+{
+	CComQIPtr<IHTMLDocument3> spDoc3(m_pHTMLDocument);
+	if (NULL == spDoc3)
+	{
+		return -1;
+	}
+	m_pageItems.clear();
+
+	CComBSTR items_container_id(L"web");
+	CComQIPtr<IHTMLElement> spgoogle_items_container_ol;
+	HRESULT hr = spDoc3->getElementById(items_container_id, &spgoogle_items_container_ol);
+	COM_R(hr, spgoogle_items_container_ol, -1);
+
+	CComQIPtr<IDispatch> spDisRsoAllChild;
+	spgoogle_items_container_ol->get_all(&spDisRsoAllChild);
+
+	CComQIPtr<IHTMLElementCollection> spCollectionHtmlElement(spDisRsoAllChild);
+	if (NULL == spCollectionHtmlElement)
+	{
+		return -1;
+	}
+
+	long lenRsoAllChildsCnt = 0;
+	spCollectionHtmlElement->get_length(&lenRsoAllChildsCnt);
+
+
+	for (long l=0; l<lenRsoAllChildsCnt; l++)
+	{
+		//deal with one <div class="res">
+		SearchResItem sri;
+
+		CComQIPtr<IHTMLElement> spDiv_Res;
+		CComQIPtr<IDispatch> spTmp;
+		spCollectionHtmlElement->item(CComVariant(l), CComVariant(l), &spTmp);
+		if(NULL == spTmp)
+		{
+			continue;
+		}
+
+		spDiv_Res = spTmp;
+		if(!checkTagClass(spDiv_Res, L"res", L"div"))
+		{
+			continue;
+		}
+
+
+		CComQIPtr<IHTMLElementCollection> spColAll;
+		CComQIPtr<IDispatch> spDisTmpX;
+		hr = spDiv_Res->get_all(&spDisTmpX);
+		spColAll = spDisTmpX;
+
+		COM_R(hr, spColAll, -1);
+
+		long lenLiGAllChild = 0;
+		hr = spColAll->get_length(&lenLiGAllChild);
+
+		CComQIPtr<IHTMLElement> divAbstract;
+		CComQIPtr<IHTMLElement> aTitle;
+		for (long y=0; y<lenLiGAllChild; y++)
+		{
+			CComQIPtr<IHTMLElement> spEleTmp;
+			CComQIPtr<IDispatch> spDisTmp;
+			spColAll->item(CComVariant(y), CComVariant(y), &spDisTmp);
+			if (NULL == spDisTmp)
+			{
+				continue;
+			}
+			spEleTmp = spDisTmp;
+
+			if(checkTagClass(spEleTmp, L"yschttl spt", L"a"))
+			{
+
+				aTitle = spEleTmp;
+				if (NULL != divAbstract)
+				{
+					break;
+				}
+
+				continue;
+			}
+
+			if(checkTagClass(spEleTmp, L"abstr", L"div"))
+			{
+
+				divAbstract = spEleTmp;
+				if (NULL != aTitle)
+				{
+					break;
+				}
+				continue;
+			}
+
+		}
+
+		if (NULL == divAbstract || NULL == aTitle)
+		{
+			continue;
+		}
+
+		
+		CComBSTR bstrTitle;
+		CComQIPtr<IHTMLAnchorElement> spAnchorTitle(aTitle);
+		if (NULL != spAnchorTitle)
+		{
+
+			CComBSTR bstrHref;
+			spAnchorTitle->get_href(&bstrHref);
+
+			if (NULL != bstrHref)
+			{
+				sri.httplink=bstrHref;
+			}
+
+			aTitle->get_innerText(&bstrTitle);
+			if(NULL != bstrTitle)
+			{
+				sri.title = bstrTitle;
+			}
+
+		}
+
+
+		if (NULL != divAbstract)
+		{
+
+			CComBSTR bstrContentTxt;
+			divAbstract->get_innerText(&bstrContentTxt);
+			if (NULL != bstrContentTxt)
+			{
+				sri.aabstract = bstrContentTxt;
+			}
+
+			std::vector<CComQIPtr<IHTMLElement>> spEleVec;
+			GetChild(L"", L"b", divAbstract, spEleVec, true);
+			for (std::vector<CComQIPtr<IHTMLElement>>::iterator it =  spEleVec.begin();
+				it != spEleVec.end();
+				it++)
+			{
+				CComQIPtr<IHTMLElement> spEm = *it;
+				CComBSTR bstrEm;
+				spEm->get_innerText(&bstrEm);
+
+				if (NULL != bstrEm)
+				{
+
+					sri.em.insert(bstrEm.m_str);
+				}
+			}
+
+		}
+		m_pageItems.push_back(sri);
+	}
+
 
 	return 0;
 }

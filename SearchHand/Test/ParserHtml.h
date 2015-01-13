@@ -49,9 +49,12 @@ private:
 
 private:
 	int CreateDom(void);
+	
 	int ParseGoogleDom(void);
+	int ParseYahooDom(void);
 
 	int GetChild(const std::wstring& szClassName, const std::wstring& szTagName, CComQIPtr<IHTMLElement> &spEleParent, std::vector<CComQIPtr<IHTMLElement>> &vecSpEleOut, const bool &bAll = false);
 	bool checkTagClass(CComQIPtr<IHTMLElement> &spEle, const std::wstring &className, const std::wstring &tagName);
+	
 };
 
