@@ -31,20 +31,20 @@ font-size:10.5pt;\
 
 std::string FormatToHtml::tail = "</div></body></html>";
 
-std::string FormatToHtml::itemTemplare = "<div>\
+std::string FormatToHtml::itemTemplare = "<div style=\"margin-top:15%;\">\
 	<p class=\"MsoNormal\" align=\"left\" style=\"margin-left:18.0pt;text-align:left;\
 	text-indent:-18.0pt;mso-pagination:widow-orphan;mso-outline-level:3;mso-list:\
-l0 level1 lfo1;tab-stops:list 36.0pt;background:white\"><span lang=\"EN-US\" style=\"font-size:13.5pt;font-family:Arial,sans-serif;mso-fareast-font-family:\
+l0 level1 lfo1;tab-stops:list 36.0pt;\"><span lang=\"EN-US\" style=\"font-size:13.5pt;font-family:Arial,sans-serif;mso-fareast-font-family:\
 	arial,sans-serif;color:#222222;mso-font-kerning:0pt\"><a href=\"%s\"><span style=\"color:#660099;\
 	text-decoration:none;text-underline:none\">%s</span></a></span></p>\
 	\
 	<p class=\"MsoNormal\" align=\"left\" style=\"text-align:left;line-height:12.0pt;\
-	mso-pagination:widow-orphan;background:white\"><span lang=\"EN-US\" style=\"mso-bidi-font-size:10.5pt;font-family:Arial,sans-serif;mso-fareast-font-family:\
+	mso-pagination:widow-orphan;\"><span lang=\"EN-US\" style=\"mso-bidi-font-size:10.5pt;font-family:Arial,sans-serif;mso-fareast-font-family:\
 	arial,sans-serif;color:#006621;mso-font-kerning:0pt\">%s</span></p>\
 	\
 	\
 	<p class=\"MsoNormal\" align=\"left\" style=\"text-align:left;line-height:13.5pt;\
-	mso-pagination:widow-orphan;background:white\"><span lang=\"EN-US\" style=\"font-size:12.0pt;font-family:Arial,sans-serif;mso-fareast-font-family:\
+	mso-pagination:widow-orphan;\"><span lang=\"EN-US\" style=\"font-size:12.0pt;font-family:Arial,sans-serif;mso-fareast-font-family:\
 	arial,sans-serif;color:#545454;mso-font-kerning:0pt\">%s</span></p>\
 	</div>";
 
@@ -74,7 +74,7 @@ int FormatToHtml::TransStructToHtml( std::multimap<int, SearchResItem>& m_page, 
 
 		if (NULL == szTmp)
 		{
-			nLen = nLenCur+2024;//之所以加1024是为了降低申请内存的几率
+			nLen = nLenCur+1024;
 			szTmp = new CHAR[nLen];
 		}
 
@@ -116,25 +116,18 @@ int FormatToHtml::TransStructToHtml( std::multimap<int, SearchResItem>& m_page, 
 
 	strHtml += tail;
 	
-	//debug
+	//DEBUG
 	{
-		std::string res;
-		
-		FILE * fp = fopen("E:\\TMP\\Xyz.html", "w+");
+		FILE * fp = fopen("E:\\TMP\\Xy.html", "w+");
 		if (NULL != fp)
 		{
-			fwrite(res.c_str(), res.length()+1,1, fp);
+			std::string strResult;
+
+			fwrite(strHtml.c_str(), strHtml.length(),1, fp);
 			fclose(fp);
 		}
 	}
-	FILE * fp = fopen("E:\\TMP\\Xy.html", "w+");
-	if (NULL != fp)
-	{
-		std::string strResult;
 	
-		fwrite(strHtml.c_str(), strHtml.length(),1, fp);
-		fclose(fp);
-	}
 	
 	return 0;
 }
