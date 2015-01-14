@@ -4,10 +4,10 @@
 #include "ParserHtml.h"
 
 
-std::wstring SearchEngineHtmlParser::GOOGLE(L"google");
-std::wstring SearchEngineHtmlParser::YAHOO(L"yahoo");
-std::wstring SearchEngineHtmlParser::BING(L"bing");
-std::wstring SearchEngineHtmlParser::BAIDU(L"baidu");
+std::wstring SearchEngineHtmlParser::GOOGLE(L"google");//0
+std::wstring SearchEngineHtmlParser::YAHOO(L"yahoo");//1
+std::wstring SearchEngineHtmlParser::BING(L"bing");//2
+std::wstring SearchEngineHtmlParser::BAIDU(L"baidu");//3
 
 SearchEngineHtmlParser::SearchEngineHtmlParser(void)
 {
@@ -27,6 +27,7 @@ int SearchEngineHtmlParser::Parse(const wchar_t * szHtmlDom, const std::wstring 
 	{
 		CreateDom();
 	}
+	m_currentSearchEngine = name;
 
 	HRESULT             hr; 
 
@@ -46,16 +47,19 @@ int SearchEngineHtmlParser::Parse(const wchar_t * szHtmlDom, const std::wstring 
 	if (_wcsicmp(name.c_str(), SearchEngineHtmlParser::GOOGLE.c_str()) == 0)
 	{
 		ParseGoogleDom();
+		
 	}
 	
 	if (_wcsicmp(name.c_str(), SearchEngineHtmlParser::YAHOO.c_str()) == 0)
 	{
 		ParseYahooDom();
+		
 	}
 
 	if (_wcsicmp(name.c_str(), SearchEngineHtmlParser::BING.c_str()) == 0)
 	{
 		ParseBingDom();
+		
 	}
 
 	return 0;
@@ -203,6 +207,7 @@ int SearchEngineHtmlParser::ParseGoogleDom(void)
 	{
 		//deal with one <li class="g">
 		SearchResItem sri;
+		sri.from = m_currentSearchEngine;
 
 		CComQIPtr<IHTMLElement> spLi_G;
 		CComQIPtr<IDispatch> spTmp;
@@ -404,6 +409,7 @@ int SearchEngineHtmlParser::ParseYahooDom(void)
 	{
 		//deal with one <div class="res">
 		SearchResItem sri;
+		sri.from = m_currentSearchEngine;
 
 		CComQIPtr<IHTMLElement> spDiv_Res;
 		CComQIPtr<IDispatch> spTmp;
@@ -579,6 +585,7 @@ int SearchEngineHtmlParser::ParseBingDom( void )
 	{
 		//deal with one <li class="b_algo">
 		SearchResItem sri;
+		sri.from = m_currentSearchEngine;
 
 		CComQIPtr<IHTMLElement> spDiv_Res;
 		CComQIPtr<IDispatch> spTmp;

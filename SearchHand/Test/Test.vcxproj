@@ -42,7 +42,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
@@ -56,7 +56,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="filetool.cpp" />
+    <ClCompile Include="FormatToHtml.cpp" />
     <ClCompile Include="ParserHtml.cpp" />
+    <ClCompile Include="SEResultSorter.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
@@ -66,12 +69,22 @@
     <ClInclude Include="..\..\Common\Include\RegExp.h" />
     <ClInclude Include="..\..\Common\Include\StringProcess.h" />
     <ClInclude Include="..\..\Common\Include\WinHttpClient.h" />
+    <ClInclude Include="FormatToHtml.h" />
     <ClInclude Include="ParserHtml.h" />
+    <ClInclude Include="SEResultSorter.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="stltool.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -225,6 +225,51 @@ inline bool SeparateString(const wstring &content, const wstring &delimiter, vec
     return true;
 }
 
+inline int WideCharToMultiByteCP(int codePage, const std::wstring &content, std::string &result)
+{
+	int iLength = 0;
+	char *szcontent = NULL;
+
+	
+	iLength = ::WideCharToMultiByte(codePage,
+		0,
+		content.c_str(),
+		content.length()+1,
+		NULL,
+		0,
+		NULL,
+		NULL);
+	if (iLength <= 0)
+	{
+		return -1;
+	}
+	iLength+=2;
+	szcontent = new char[iLength];
+	if (szcontent == NULL)
+	{
+		return -1;
+	}
+
+	iLength = ::WideCharToMultiByte(codePage,
+		0,
+		content.c_str(),
+		content.length()+1,
+		szcontent,
+		iLength,
+		NULL,
+		NULL);
+	
+	result = szcontent;
+
+	if (NULL != szcontent)
+	{
+		delete [] szcontent;
+		szcontent = NULL;
+	}
+
+	return 0;
+}
+
 inline wstring URLEncoding(const wstring &keyword, bool convertToUTF8 = true)
 {
     int iLength = 0;

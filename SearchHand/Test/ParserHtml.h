@@ -1,4 +1,5 @@
 #pragma once
+#include "stltool.h"
 #include <MsHTML.h>
 #include <mshtmcid.h>
 #include <mshtmhst.h>
@@ -8,14 +9,7 @@
 #include <set>
 #include <iostream>
 
-struct wstringComparer
-{
-public:
-	bool operator()(const std::wstring &x, const std::wstring &y) const
-	{
-		return true;
-	}
-};
+
 
 struct SearchResItem
 {
@@ -23,7 +17,17 @@ struct SearchResItem
 	std::wstring time;
 	std::wstring httplink;
 	std::wstring aabstract;
-	std::multiset<std::wstring, wstringComparer> em;
+	std::set<std::wstring, wstringComparer> em;
+	std::wstring from;//来自哪个搜索引擎
+	int length()
+	{
+		int nLen = title.length()+	time.length() + httplink.length() +	aabstract.length() + from.length();
+		for (std::set<std::wstring, wstringComparer>::iterator it=em.begin(); it != em.end(); it++)
+		{
+			nLen += it->length();
+		}
+		return nLen;
+	}
 };
 
 //std::vector<SearchResItem> SearchResPage;
@@ -31,10 +35,10 @@ struct SearchResItem
 class SearchEngineHtmlParser
 {
 public:
-	static std::wstring GOOGLE;
-	static std::wstring YAHOO;
-	static std::wstring BING;
-	static std::wstring BAIDU;
+	static std::wstring GOOGLE;//0
+	static std::wstring YAHOO;//1
+	static std::wstring BING;//2
+	static std::wstring BAIDU;//3
 
 public:
 	SearchEngineHtmlParser(void);
@@ -45,7 +49,7 @@ public:
 private:
 	ATL::CComQIPtr<IHTMLDocument2>    m_pHTMLDocument;
 	ATL::CComPtr<IUnknown>            m_punk;
-	
+	std::wstring					  m_currentSearchEngine;
 
 
 private:
