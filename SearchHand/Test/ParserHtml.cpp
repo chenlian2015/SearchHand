@@ -4,24 +4,24 @@
 #include "ParserHtml.h"
 
 
-std::wstring ParserHtml::GOOGLE(L"google");
-std::wstring ParserHtml::YAHOO(L"yahoo");
-std::wstring ParserHtml::BING(L"bing");
-std::wstring ParserHtml::BAIDU(L"baidu");
+std::wstring SearchEngineHtmlParser::GOOGLE(L"google");
+std::wstring SearchEngineHtmlParser::YAHOO(L"yahoo");
+std::wstring SearchEngineHtmlParser::BING(L"bing");
+std::wstring SearchEngineHtmlParser::BAIDU(L"baidu");
 
-ParserHtml::ParserHtml(void)
+SearchEngineHtmlParser::SearchEngineHtmlParser(void)
 {
 	
 }
 
 
-ParserHtml::~ParserHtml(void)
+SearchEngineHtmlParser::~SearchEngineHtmlParser(void)
 {
 }
 
 #define COM_R(H,P,R)  if(FAILED(H) || NULL == (P)) return R;
 
-int ParserHtml::Parse(const wchar_t * szHtmlDom, const std::wstring &name)
+int SearchEngineHtmlParser::Parse(const wchar_t * szHtmlDom, const std::wstring &name)
 {
 	if (NULL == m_pHTMLDocument)
 	{
@@ -43,17 +43,17 @@ int ParserHtml::Parse(const wchar_t * szHtmlDom, const std::wstring &name)
 
 	hr = m_pHTMLDocument->close();
 
-	if (_wcsicmp(name.c_str(), ParserHtml::GOOGLE.c_str()) == 0)
+	if (_wcsicmp(name.c_str(), SearchEngineHtmlParser::GOOGLE.c_str()) == 0)
 	{
 		ParseGoogleDom();
 	}
 	
-	if (_wcsicmp(name.c_str(), ParserHtml::YAHOO.c_str()) == 0)
+	if (_wcsicmp(name.c_str(), SearchEngineHtmlParser::YAHOO.c_str()) == 0)
 	{
 		ParseYahooDom();
 	}
 
-	if (_wcsicmp(name.c_str(), ParserHtml::BING.c_str()) == 0)
+	if (_wcsicmp(name.c_str(), SearchEngineHtmlParser::BING.c_str()) == 0)
 	{
 		ParseBingDom();
 	}
@@ -62,7 +62,7 @@ int ParserHtml::Parse(const wchar_t * szHtmlDom, const std::wstring &name)
 }
 
 
-int ParserHtml::CreateDom(void)
+int SearchEngineHtmlParser::CreateDom(void)
 {
 	HRESULT             hr; 
 	::CoInitialize(NULL);
@@ -75,7 +75,7 @@ int ParserHtml::CreateDom(void)
 	return 0;
 }
 
-bool ParserHtml::checkTagClass(CComQIPtr<IHTMLElement> &spEle, const std::wstring &className, const std::wstring &tagName, const std::wstring & target)
+bool SearchEngineHtmlParser::checkTagClass(CComQIPtr<IHTMLElement> &spEle, const std::wstring &className, const std::wstring &tagName, const std::wstring & target)
 {
 	bool bRet = false;
 	
@@ -97,9 +97,12 @@ bool ParserHtml::checkTagClass(CComQIPtr<IHTMLElement> &spEle, const std::wstrin
 		eleTarget = bstrTarget;
 	}
 
+#ifdef DEBUG
 	CComBSTR bstrOut, bstrIn;
 	spEle->get_outerHTML(&bstrOut);
 	spEle->get_innerHTML(&bstrIn);
+#endif
+
 	if (NULL != bstrTagName)
 	{
 		eleTagName = bstrTagName;
@@ -120,7 +123,7 @@ bool ParserHtml::checkTagClass(CComQIPtr<IHTMLElement> &spEle, const std::wstrin
 	return bRet;
 }
 
-int ParserHtml::GetChild(const std::wstring& szClassName, const std::wstring& szTagName, CComQIPtr<IHTMLElement> &spEleParent, std::vector<CComQIPtr<IHTMLElement>> &vecSpEleOut, const bool &bAll)
+int SearchEngineHtmlParser::GetChild(const std::wstring& szClassName, const std::wstring& szTagName, CComQIPtr<IHTMLElement> &spEleParent, std::vector<CComQIPtr<IHTMLElement>> &vecSpEleOut, const bool &bAll)
 {
 
 	CComQIPtr<IDispatch> spDisTmp;
@@ -169,7 +172,7 @@ int ParserHtml::GetChild(const std::wstring& szClassName, const std::wstring& sz
 
 
 
-int ParserHtml::ParseGoogleDom(void)
+int SearchEngineHtmlParser::ParseGoogleDom(void)
 {
 	CComQIPtr<IHTMLDocument3> spDoc3(m_pHTMLDocument);
 	if (NULL == spDoc3)
@@ -370,7 +373,7 @@ int ParserHtml::ParseGoogleDom(void)
 	return 0;
 }
 
-int ParserHtml::ParseYahooDom(void)
+int SearchEngineHtmlParser::ParseYahooDom(void)
 {
 	CComQIPtr<IHTMLDocument3> spDoc3(m_pHTMLDocument);
 	if (NULL == spDoc3)
@@ -528,7 +531,7 @@ int ParserHtml::ParseYahooDom(void)
 	return 0;
 }
 
-int ParserHtml::showForDebug()
+int SearchEngineHtmlParser::showForDebug()
 {
 	int n = 0;
 	std::wcout.imbue(std::locale("chs"));
@@ -545,7 +548,7 @@ int ParserHtml::showForDebug()
 	return 0;
 }
 
-int ParserHtml::ParseBingDom( void )
+int SearchEngineHtmlParser::ParseBingDom( void )
 {
 	CComQIPtr<IHTMLDocument3> spDoc3(m_pHTMLDocument);
 	if (NULL == spDoc3)

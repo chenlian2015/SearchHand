@@ -23,12 +23,12 @@ struct SearchResItem
 	std::wstring time;
 	std::wstring httplink;
 	std::wstring aabstract;
-	std::set<std::wstring, wstringComparer> em;
+	std::multiset<std::wstring, wstringComparer> em;
 };
 
 //std::vector<SearchResItem> SearchResPage;
 
-class ParserHtml
+class SearchEngineHtmlParser
 {
 public:
 	static std::wstring GOOGLE;
@@ -37,8 +37,8 @@ public:
 	static std::wstring BAIDU;
 
 public:
-	ParserHtml(void);
-	~ParserHtml(void);
+	SearchEngineHtmlParser(void);
+	~SearchEngineHtmlParser(void);
 	int Parse(const wchar_t * szHtmlDom, const std::wstring &searchEngineName);
 
 	std::vector<SearchResItem>		  m_pageItems;
