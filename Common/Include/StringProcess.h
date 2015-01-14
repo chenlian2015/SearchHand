@@ -134,6 +134,7 @@ inline wstring LowerString(const wstring &text)
     _wcslwr_s(pTemp, iLength);
     wstring retStr = pTemp;
     delete[] pTemp;
+	pTemp = NULL;
 
     return retStr;
 }
@@ -154,7 +155,7 @@ inline wstring UpperString(const wstring &text)
     _wcsupr_s(pTemp, iLength);
     wstring retStr = pTemp;
     delete[] pTemp;
-
+	pTemp = NULL;
     return retStr;
 }
 
@@ -328,6 +329,7 @@ inline wstring URLEncoding(const wstring &keyword, bool convertToUTF8 = true)
     if (szKeyword != NULL)
     {
         delete[] szKeyword;
+		szKeyword = NULL;
     }
     encodedKeyword = (wchar_t *)(_bstr_t)strEncodedKeyword.c_str();
     encodedKeyword = ReplaceString(encodedKeyword, L" ", L"+");

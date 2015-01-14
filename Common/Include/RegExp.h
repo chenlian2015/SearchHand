@@ -139,6 +139,7 @@ inline bool ParseRegExp(const wstring &regExp, bool caseSensitive, int groupCoun
     }
 
     delete[] pSource;
+	pSource = NULL;
 
     return true;
 }

@@ -27,7 +27,7 @@ public:
 				continue;
 			}
 
-			m_page.insert(std::pair<int, SearchResItem>(it->em.size(), *it));
+			m_page.insert(std::pair<int, SearchResItem>(-it->em.size(), *it));
 		}
 		
 		return 0;

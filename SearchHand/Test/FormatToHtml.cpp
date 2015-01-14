@@ -70,7 +70,23 @@ int FormatToHtml::TransStructToHtml( std::multimap<int, SearchResItem>& m_page, 
 	int nLen = 0;
 	for (std::multimap<int, SearchResItem>::iterator it = page.begin(); it != page.end(); it++)
 	{
-		int nLenCur = itemTemplare.length() + it->second.length();
+		
+		for (std::set<std::wstring, wstringComparer>::iterator item = it->second.em.begin(); item != it->second.em.end(); item++)
+		{
+			std::wstring strBold=L"<font color=\"red\">";
+			strBold.append(*item);
+			strBold.append(L"</font>");
+
+			it->second.aabstract = ReplaceString(it->second.aabstract, *item, strBold);
+		}
+
+		setlocale(LC_ALL, "en-US");
+		std::string httplink,title,aabstract;
+		WideCharToMultiByteCP(CP_UTF8, it->second.httplink.c_str(),httplink);
+		WideCharToMultiByteCP(CP_UTF8, it->second.title.c_str(), title);
+		WideCharToMultiByteCP(CP_UTF8, it->second.aabstract.c_str(), aabstract);
+
+		int nLenCur = itemTemplare.length() + httplink.length()*2 + title.length() + aabstract.length();
 
 		if (NULL == szTmp)
 		{
@@ -85,20 +101,7 @@ int FormatToHtml::TransStructToHtml( std::multimap<int, SearchResItem>& m_page, 
 			nLen = nLenCur;
 			szTmp = new CHAR[nLen];
 		}
-		for (std::set<std::wstring, wstringComparer>::iterator item = it->second.em.begin(); item != it->second.em.end(); item++)
-		{
-			std::wstring strBold=L"<b>";
-			strBold.append(*item);
-			strBold.append(L"</b>");
 
-			ReplaceString(it->second.aabstract, *item, strBold);
-		}
-
-		setlocale(LC_ALL, "en-US");
-		std::string httplink,title,aabstract;
-		WideCharToMultiByteCP(CP_UTF8, it->second.httplink.c_str(),httplink);
-		WideCharToMultiByteCP(CP_UTF8, it->second.title.c_str(), title);
-		WideCharToMultiByteCP(CP_UTF8, it->second.aabstract.c_str(), aabstract);
 		sprintf(szTmp, "%s", httplink.c_str());
 		sprintf(szTmp, "%s", title.c_str());
 		sprintf(szTmp, "%s", aabstract.c_str());
@@ -123,7 +126,7 @@ int FormatToHtml::TransStructToHtml( std::multimap<int, SearchResItem>& m_page, 
 		{
 			std::string strResult;
 
-			fwrite(strHtml.c_str(), strHtml.length(),1, fp);
+			fwrite(strHtml.c_str(), 1, strHtml.length(), fp);
 			fclose(fp);
 		}
 	}

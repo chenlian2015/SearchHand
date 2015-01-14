@@ -196,22 +196,29 @@ std::wstring GrabSearchEngineData(const std::wstring &strRequest)
 
 }
 
-int _tmain(int /*argc*/, _TCHAR** /*argv*/)
+int _tmain(int argc, _TCHAR** argv)
 {
+	if (argc>1)
+	{
 
-	std::wstring searchAddress[] = {L"https://www.google.com.hk/search?q=american", L"https://search.yahoo.com/search?p=american", L"http://www.bing.com/search?q=american"};
+	}
+	
+	std::wstring searchAddress[] = {L"https://www.google.com.hk/search?q=", L"https://search.yahoo.com/search?p=", L"http://www.bing.com/search?q="};
 
-	std::wstring str = GrabSearchEngineData(searchAddress[0]);
+	std::wstring str = GrabSearchEngineData(searchAddress[0].append(argv[1]));
+	
 	SearchEngineHtmlParser phG;
 	phG.Parse(str.c_str(), SearchEngineHtmlParser::GOOGLE);
 	phG.showForDebug();
 
-//	str = GrabSearchEngineData(searchAddress[1]);
+	str = GrabSearchEngineData(searchAddress[1].append(argv[1]));
+	
 	SearchEngineHtmlParser phY;
-//	phY.Parse(str.c_str(), SearchEngineHtmlParser::YAHOO);
-//	phY.showForDebug();
+	phY.Parse(str.c_str(), SearchEngineHtmlParser::YAHOO);
+	phY.showForDebug();
 
-	str = GrabSearchEngineData(searchAddress[2]);
+	str = GrabSearchEngineData(searchAddress[2].append(argv[1]));
+	
 	SearchEngineHtmlParser phB;
 	phB.Parse(str.c_str(), SearchEngineHtmlParser::BING);
 	phB.showForDebug();

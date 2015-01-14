@@ -130,10 +130,12 @@ WinHttpClient::~WinHttpClient(void)
     if (m_pResponse != NULL)
     {
         delete[] m_pResponse;
+		m_pResponse = NULL;
     }
     if (m_pDataToSend != NULL)
     {
         delete[] m_pDataToSend;
+		m_pDataToSend = NULL;
     }
 
     if (m_sessionHandle != NULL)
@@ -473,6 +475,7 @@ bool WinHttpClient::SendHttpRequest(const wstring &httpVerb, bool disableAutoRed
                                         }
                                     }
                                     delete[] szHeader;
+									szHeader = NULL;
                                 }
                             }
                             
@@ -499,6 +502,7 @@ bool WinHttpClient::SendHttpRequest(const wstring &httpVerb, bool disableAutoRed
                                         m_statusCode = szStatusCode;
                                     }
                                     delete[] szStatusCode;
+									szStatusCode = NULL;
                                 }
                             }
 
@@ -546,11 +550,13 @@ bool WinHttpClient::SendHttpRequest(const wstring &httpVerb, bool disableAutoRed
                                                 memset(m_pResponse, 0, iMaxBufferSize);
                                                 memcpy(m_pResponse, pOldBuffer, iCurrentBufferSize);
                                                 delete[] pOldBuffer;
+												pOldBuffer = NULL;
                                             }
                                             memcpy(m_pResponse + iCurrentBufferSize, pResponse, dwRead);
                                             iCurrentBufferSize += dwRead;
                                         }
                                         delete[] pResponse;
+										pResponse = NULL;
                                     }
                                 }
                                 else
@@ -621,6 +627,7 @@ bool WinHttpClient::SendHttpRequest(const wstring &httpVerb, bool disableAutoRed
 
 
                                     delete[] wideChar;
+									wideChar = NULL;
                                 }
                             }
                             bGetReponseSucceed = true;
@@ -735,6 +742,7 @@ bool WinHttpClient::SetAdditionalDataToSend(BYTE *data, unsigned int dataSize)
     if (m_pDataToSend != NULL)
     {
         delete[] m_pDataToSend;
+		m_pDataToSend = NULL;
     }
     m_pDataToSend = NULL;
     m_pDataToSend = new BYTE[dataSize];
@@ -754,6 +762,7 @@ bool WinHttpClient::ResetAdditionalDataToSend(void)
     if (m_pDataToSend != NULL)
     {
         delete[] m_pDataToSend;
+		m_pDataToSend = NULL;
     }
 
     m_pDataToSend = NULL;
