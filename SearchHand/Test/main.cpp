@@ -203,9 +203,6 @@ std::wstring GrabSearchEngineData(const std::wstring &strRequest)
 using namespace std;
 
 
-
-
-
 int _tmain(int argc, _TCHAR** argv)
 {
 	if (argc<=1)
