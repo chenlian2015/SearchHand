@@ -80,7 +80,7 @@ int FormatToHtml::TransStructToHtml( std::multimap<int, SearchResItem>& m_page, 
 			it->second.aabstract = ReplaceString(it->second.aabstract, *item, strBold);
 		}
 
-		setlocale(LC_ALL, "en-US");
+		//setlocale(LC_ALL, "en-US");
 		std::string httplink,title,aabstract;
 		WideCharToMultiByteCP(CP_UTF8, it->second.httplink.c_str(),httplink);
 		WideCharToMultiByteCP(CP_UTF8, it->second.title.c_str(), title);

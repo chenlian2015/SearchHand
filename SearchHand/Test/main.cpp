@@ -196,28 +196,46 @@ std::wstring GrabSearchEngineData(const std::wstring &strRequest)
 
 }
 
+#include <string>
+#include <sstream>
+#include <iostream>
+
+using namespace std;
+
+
+
+
+
 int _tmain(int argc, _TCHAR** argv)
 {
-	if (argc>1)
+	if (argc<=1)
 	{
-
+		std::cout<<"please add what you wang search"<<std::endl;
+		return -1;
 	}
-	
-	std::wstring searchAddress[] = {L"https://www.google.com.hk/search?q=", L"https://search.yahoo.com/search?p=", L"http://www.bing.com/search?q="};
 
-	std::wstring str = GrabSearchEngineData(searchAddress[0].append(argv[1]));
+
+	std::wstring strSearchHexEncode ;
+	strSearchHexEncode = URLEncoding(argv[1]);
+    
+	
+	
+	std::wstring searchAddress[] = {L"https://www.google.com.hk/search?&start=10&q=", L"https://search.yahoo.com/search?p=", L"http://www.bing.com/search?q="};
+
+	std::wstring str = GrabSearchEngineData(searchAddress[0].append(strSearchHexEncode));
 	
 	SearchEngineHtmlParser phG;
 	phG.Parse(str.c_str(), SearchEngineHtmlParser::GOOGLE);
 	phG.showForDebug();
 
-	str = GrabSearchEngineData(searchAddress[1].append(argv[1]));
+	str = GrabSearchEngineData(searchAddress[1].append(strSearchHexEncode));
 	
 	SearchEngineHtmlParser phY;
 	phY.Parse(str.c_str(), SearchEngineHtmlParser::YAHOO);
 	phY.showForDebug();
 
-	str = GrabSearchEngineData(searchAddress[2].append(argv[1]));
+
+	str = GrabSearchEngineData(searchAddress[2].append(strSearchHexEncode));
 	
 	SearchEngineHtmlParser phB;
 	phB.Parse(str.c_str(), SearchEngineHtmlParser::BING);
