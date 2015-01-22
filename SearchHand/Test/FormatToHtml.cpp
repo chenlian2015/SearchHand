@@ -45,7 +45,7 @@ l0 level1 lfo1;tab-stops:list 36.0pt;\"><span lang=\"EN-US\" style=\"font-size:1
 	\
 	<p class=\"MsoNormal\" align=\"left\" style=\"text-align:left;line-height:13.5pt;\
 	mso-pagination:widow-orphan;\"><span lang=\"EN-US\" style=\"font-size:12.0pt;font-family:Arial,sans-serif;mso-fareast-font-family:\
-	arial,sans-serif;color:#545454;mso-font-kerning:0pt\">%s</span></p>\
+	arial,sans-serif;color:#545454;mso-font-kerning:0pt\">%s <font color=\"#8888ff\">from  %s</font></span></p>\
 	</div>";
 
 
@@ -81,11 +81,11 @@ int FormatToHtml::TransStructToHtml( std::multimap<int, SearchResItem>& m_page, 
 		}
 
 		//setlocale(LC_ALL, "en-US");
-		std::string httplink,title,aabstract;
+		std::string httplink,title,aabstract, from;
 		WideCharToMultiByteCP(CP_UTF8, it->second.httplink.c_str(),httplink);
 		WideCharToMultiByteCP(CP_UTF8, it->second.title.c_str(), title);
 		WideCharToMultiByteCP(CP_UTF8, it->second.aabstract.c_str(), aabstract);
-
+		WideCharToMultiByteCP(CP_UTF8, it->second.from.c_str(), from);
 		int nLenCur = itemTemplare.length() + httplink.length()*2 + title.length() + aabstract.length();
 
 		if (NULL == szTmp)
@@ -102,10 +102,8 @@ int FormatToHtml::TransStructToHtml( std::multimap<int, SearchResItem>& m_page, 
 			szTmp = new CHAR[nLen];
 		}
 
-		sprintf(szTmp, "%s", httplink.c_str());
-		sprintf(szTmp, "%s", title.c_str());
-		sprintf(szTmp, "%s", aabstract.c_str());
-		sprintf(szTmp, itemTemplare.c_str(), httplink.c_str(), title.c_str(), httplink.c_str(), aabstract.c_str());
+
+		sprintf(szTmp, itemTemplare.c_str(), httplink.c_str(), title.c_str(), httplink.c_str(), aabstract.c_str(), from.c_str());
 		strHtml +=szTmp;
 
 	}
